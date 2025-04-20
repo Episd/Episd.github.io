@@ -11,6 +11,7 @@ nav:
       - MyBatis: 
         - MyBatis核心对象: Notes/JavaEE/MyBatis/MyBatisCoreObject/MyBatisCoreObject.md
         - MyBatis核心配置文件: Notes/JavaEE/MyBatis/MyBatisCoreConfig/MyBatisCoreConfig.md
+        - MyBatis映射文件: Notes/JavaEE/MyBatis/MyBatisMapperFile/MyBatisMapperFile.md
   - DevelopmentDiary:
     - Introduction: DevelopmentDiary.md
     - Mkdocs个人博客搭建: 
