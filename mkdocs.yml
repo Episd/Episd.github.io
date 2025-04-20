@@ -1,5 +1,15 @@
 site_name: Made by YZJ
-site_url: https://mydomain.org/mysite
+site_description: a personal blog made by YZJ
+repo_url: https://github.com/Episd/Episd.github.io.git
+
+nav:
+  - Introduction:
+    - About YZJ: index.md
+  - Notes:
+    - Introduction: Notes.md
+    - JavaEE:
+      - MyBatis: Notes\JavaEE\MyBatis\MyBatis.md
+
 theme:
   name: material
   font:
@@ -23,20 +33,32 @@ theme:
         name: Light mode
       primary: white
       accent: deep orange
-  
+  features:
+    - navigation.tabs
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.indexes
+    - content.code.copy
+
 markdown_extensions:
-- attr_list
-# 可以使用emoji
-- pymdownx.emoji:
-    emoji_index: !!python/name:material.extensions.emoji.twemoji
-    emoji_generator: !!python/name:material.extensions.emoji.to_svg
-# 允许使用网格
-- md_in_html
-# 格式
-- pymdownx.critic
-- pymdownx.caret
-- pymdownx.keys
-- pymdownx.mark
-- pymdownx.tilde
-# 表格
-- tables
+  - attr_list
+  # 可以使用emoji
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  # 允许使用网格
+  - md_in_html
+  # 格式
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  # 表格
+  - tables
+  # 代码语法高亮
+  - pymdownx.highlight:
+      pygments_lang_class: true
+      use_pygments: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
