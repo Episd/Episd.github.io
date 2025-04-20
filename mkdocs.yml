@@ -8,7 +8,23 @@ nav:
   - Notes:
     - Introduction: Notes.md
     - JavaEE:
-      - MyBatis: Notes/JavaEE/MyBatis/MyBatis.md
+      - MyBatis: 
+        - MyBatis核心对象: Notes/JavaEE/MyBatis/MyBatisCoreObject/MyBatisCoreObject.md
+        - MyBatis核心配置文件: Notes/JavaEE/MyBatis/MyBatisCoreConfig/MyBatisCoreConfig.md
+  - DevelopmentDiary:
+    - Introduction: DevelopmentDiary.md
+    - Mkdocs个人博客搭建: 
+      - 环境搭建: DevelopmentDiary/MkdocsBlog/EnvironmentBuild/EnvironmentBuild.md
+      - 学习&开发日志: DevelopmentDiary/MkdocsBlog/Study&Development/Study&Development.md
+
+
+
+
+
+
+
+
+
 
 theme:
   name: material
@@ -39,26 +55,37 @@ theme:
     - navigation.instant.prefetch
     - navigation.indexes
     - content.code.copy
+    - content.code.select
+    - content.code.annotate
 
 markdown_extensions:
+  - def_list
+  - pymdownx.tasklist:
+        custom_checkbox: true
+        clickable_checkbox: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
   - attr_list
-  # 可以使用emoji
+  - md_in_html
+  - pymdownx.arithmatex:
+        generic: true
+  - pymdownx.highlight:
+        anchor_linenums: true
+        line_spans: __span
+        pygments_lang_class: true
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+        alternate_style: true
+      # 可以使用emoji
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
-  # 允许使用网格
-  - md_in_html
-  # 格式
   - pymdownx.critic
   - pymdownx.caret
   - pymdownx.keys
   - pymdownx.mark
   - pymdownx.tilde
-  # 表格
-  - tables
-  # 代码语法高亮
-  - pymdownx.highlight:
-      pygments_lang_class: true
-      use_pygments: true
-  - pymdownx.superfences
-  - pymdownx.inlinehilite
+  
