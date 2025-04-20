@@ -123,7 +123,7 @@ MyBatis的运行环境信息包括事务管理器和数据源。在MyBatis的核
     </environment>  ...
 </environments>
 ```
-在MyBatis中，\<transcationManager\> 元素可以配置两种类型的事务管理器，分别是JDBC和MANAGED。
+在MyBatis中，`<transcationManager>` 元素可以配置两种类型的事务管理器，分别是JDBC和MANAGED。
 
 - JDBC：此配置直接使用JDBC的提交和回滚设置，它依赖于从数据源得到的连接来管理事务的作用域。
 
@@ -140,3 +140,39 @@ MyBatis的运行环境信息包括事务管理器和数据源。在MyBatis的核
 |             username             |     登录数据库的用户名      |
 |             password             |      登录数据库的密码      |
 | defaultTransactionIsolationLevel |    默认的连接事务隔离级别     |
+
+POOLED表示数据源为连接池类型。POOLED数据源利用“池”的概念将JDBC连接对象组织起来，节省了在创建新的连接对象时需要初始化和认证的时间。POOLED数据源使得并发Web应用可以快速的响应请求，是当前比较流行的数据源配置类型。
+
+- [ ] 如果有需要，再在这里加，现在这ppt里的东西完全看不懂
+
+### `<mappers>` 元素
+
+`<mappers>` 元素用于引入MyBatis映射文件。映射文件包含了POJO对象和数据表之间的映射信息，通过`<mappers>` 元素引入映射文件的方法有4种。
+
+=== "使用类路径引入"
+    ```xml
+    <mappers>
+        <mapper resource="com/itheima/mapper/UserMapper.xml"/>
+    </mappers>
+    ```
+
+=== "使用本地路径引入"
+    ```xml
+    <mappers>
+        <mapper url="file:///D:/com/itheima/mapper/UserMapper.xml"/>
+    </mappers>
+    ```
+
+=== "使用类接口引入"
+    ```xml
+    <mappers>
+        <mapper class="com.itheima.mapper.UserMapper"/>
+    </mappers>
+    ```
+
+=== "使用包名引入"
+    ```xml
+    <mappers>
+        <package name="com.itheima.mapper"/>
+    </mappers>
+    ```
