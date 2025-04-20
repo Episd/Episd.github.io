@@ -8,7 +8,7 @@ nav:
   - Notes:
     - Introduction: Notes.md
     - JavaEE:
-      - MyBatis: Notes\JavaEE\MyBatis\MyBatis.md
+      - MyBatis: Notes/JavaEE/MyBatis/MyBatis.md
 
 theme:
   name: material

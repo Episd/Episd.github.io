@@ -19,4 +19,3 @@ SqlSessionFactoryBuilder 是线程安全的，有一个就行，建议使用单�
 
 SqlSessionFactory 的方法：
 
-|    方法名称    |    
