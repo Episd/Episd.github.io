@@ -1,19 +1,23 @@
 site_name: Made by YZJ
 site_description: a personal blog made by YZJ
 repo_url: https://github.com/Episd/Episd.github.io.git
+copyright: "Copyright &copy YZJ"
 
 nav:
   - Introduction:
-    - About YZJ: index.md
+    - Intoduction: index.md
+    - KnowingYZJ: KnowingYZJ.md
   - Notes:
-    - Introduction: Notes.md
+    - Introduction: Notes/Notes.md
     - JavaEE:
       - MyBatis: 
         - MyBatis核心对象: Notes/JavaEE/MyBatis/MyBatisCoreObject/MyBatisCoreObject.md
         - MyBatis核心配置文件: Notes/JavaEE/MyBatis/MyBatisCoreConfig/MyBatisCoreConfig.md
         - MyBatis映射文件: Notes/JavaEE/MyBatis/MyBatisMapperFile/MyBatisMapperFile.md
+        - 动态SQL: Notes/JavaEE/MyBatis/DynamicSQL/DynamicSQL.md
+      - 其他: Notes/JavaEE/Others/Others.md
   - DevelopmentDiary:
-    - Introduction: DevelopmentDiary.md
+    - Introduction: DevelopmentDiary/DevelopmentDiary.md
     - Mkdocs个人博客搭建: 
       - 环境搭建: DevelopmentDiary/MkdocsBlog/EnvironmentBuild/EnvironmentBuild.md
       - 学习&开发日志: DevelopmentDiary/MkdocsBlog/Study&Development/Study&Development.md
@@ -57,9 +61,14 @@ theme:
     - navigation.instant
     - navigation.instant.prefetch
     - navigation.indexes
+    - navigation.footer
     - content.code.copy
     - content.code.select
     - content.code.annotate
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Episd/Episd.github.io.git
 
 markdown_extensions:
   - def_list
@@ -91,4 +100,3 @@ markdown_extensions:
   - pymdownx.keys
   - pymdownx.mark
   - pymdownx.tilde
-  

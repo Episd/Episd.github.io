@@ -1,7 +1,4 @@
-# Introduction
-
 欢迎来到我的博客！
-
 ## 关于YZJ
 
 <div class="grid cards" markdown>

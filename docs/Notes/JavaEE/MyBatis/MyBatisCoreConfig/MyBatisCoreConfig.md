@@ -176,3 +176,6 @@ POOLED表示数据源为连接池类型。POOLED数据源利用“池”的概�
         <package name="com.itheima.mapper"/>
     </mappers>
     ```
+
+??? note "注意"
+    使用类路径引入和本地路径引入，上下级之间是斜杠(/)而不是点(.)

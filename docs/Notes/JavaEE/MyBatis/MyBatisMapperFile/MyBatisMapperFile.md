@@ -62,7 +62,7 @@ namespace 属性的两个作用：
     User user = userDao.getUserById(1); // 自动执行对应SQL
     ```
 
-??? note "`<mapper>`元素如何却别不同的 XML 文件"
+??? note "`<mapper>`元素如何区别不同的 XML 文件"
     在不同的映射文件中，<mapper>元素的子元素的id可以相同，MyBatis通过<mapper>元素的namespace属性值和子元素的id联合区分不同的Mapper.xml文件。接口中的方法与映射文件中SQL语句id应一一对应
 
 ### `<select>` 元素
@@ -93,7 +93,7 @@ namespace 属性的两个作用：
 
 ```xml title="插入操作"
 <insert id="addUser" parameterType="com.itheima.pojo.User">
-    insert into users(uid,uname,uage)values(#{uid},#{uname},#{uage})
+    insert into users(uid,uname,uage) values(#{uid},#{uname},#{uage})
 </insert>
 ```
 
@@ -142,8 +142,8 @@ namespace 属性的两个作用：
 
 ```xml title="根据客户id查询客户信息的SQL片段 "
 <!--定义要查询的表 -->
-<sql id=“someinclude">from <include refid="${include_target}" /></sql>
-<!--定义查询列 --><sql id=“userColumns">	uid,uname,uage 	</sql>
+<sql id="someinclude">from <include refid="${include_target}" /></sql>
+<!--定义查询列 --><sql id="userColumns">	uid,uname,uage 	</sql>
 <!--根据客户id查询客户信息 -->
 <select id="findUserById" parameterType="Integer" 
          resultType="com.itheima.pojo.User">	select 
