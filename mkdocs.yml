@@ -15,6 +15,8 @@ nav:
         - MyBatis核心配置文件: Notes/JavaEE/MyBatis/MyBatisCoreConfig/MyBatisCoreConfig.md
         - MyBatis映射文件: Notes/JavaEE/MyBatis/MyBatisMapperFile/MyBatisMapperFile.md
         - 动态SQL: Notes/JavaEE/MyBatis/DynamicSQL/DynamicSQL.md
+      - Spring:
+        - SpringAOP: Notes/JavaEE/Spring/SpringAOP/SpringAOP.md
       - 其他: Notes/JavaEE/Others/Others.md
   - DevelopmentDiary:
     - Introduction: DevelopmentDiary/DevelopmentDiary.md
