@@ -18,6 +18,8 @@ nav:
       - Spring:
         - SpringAOP: Notes/JavaEE/Spring/SpringAOP/SpringAOP.md
       - 其他: Notes/JavaEE/Others/Others.md
+    - Vue3:
+      - 安装&创建Vue项目: Notes/Vue3/Installation/Installation.md
   - DevelopmentDiary:
     - Introduction: DevelopmentDiary/DevelopmentDiary.md
     - Mkdocs个人博客搭建: 
