@@ -73,58 +73,200 @@ public void refundOrder() {
 
 此时可以引入 AOP 部分思想，将日志这个所有方法都有的业务抽离出来，形成一个切面
 
-```Java
-public class OrderService {
-    public void printLog() {
+```Java title="切面类"
+public class LogAspect {
+    public void logBefore() {
         System.out.println("[日志] 正在执行订单服务！");
     }
+}
+```
+
+然后就可以在这个切面的所有切点（用到该切面的通知逻辑的所有方法）中书写对应的输出
+
+```Java
+public class OrderService {
     public void createOrder() {
-        printLog();
+        LogAspect logAspect = new LogAspect();
+        logAspect.logBefore();
         System.out.println("下单成功！");
     }
 
     public void cancelOrder() {
-        printLog();
+        LogAspect logAspect = new LogAspect();
+        logAspect.logBefore();
         System.out.println("订单取消！");
     }
 
     public void refundOrder() {
-        printLog();
+        LogAspect logAspect = new LogAspect();
+        logAspect.logBefore();
         System.out.println("退款成功！");
     }
 }
 ```
 
-这样虽然在维护时时不用修改所有的方法，耦合度还是太高了，有新功能时还是要修改 OrderService 这个类。那么就可以引入代理这个思想，通过一个代理对象将类似**日志**这种业务在代码执行的时候**注入**进原来的对象中，实现原来对象的**增强**
+这样虽然在维护时时不用修改所有的方法，耦合度还是太高了，有新功能时还是要修改OrderService 这个类。要使这两者尽可能解耦，那么就可以引入代理这个思想，通过一个代理对象将代码中的 `logAspect.logBefore();` 这一行代码注入进原来对象中
 
 我们先实现一个代理类，用于“增强”原始的 OrderService：
 
 ```Java
 public class OrderServiceProxy {
+    // 要增强的目标对象
     private OrderService target;
-
     public OrderServiceProxy(OrderService target) {
         this.target = target;
     }
 
     public void createOrder() {
-        System.out.println("[日志] 正在执行 createOrder 方法");
+        LogAspect logAspect = new LogAspect();
+        logAspect.logBefore();
         target.createOrder();
     }
 
     public void cancelOrder() {
-        System.out.println("[日志] 正在执行 cancelOrder 方法");
+        LogAspect logAspect = new LogAspect();
+        logAspect.logBefore();
         target.cancelOrder();
     }
 
     public void refundOrder() {
-        System.out.println("[日志] 正在执行 refundOrder 方法");
+        LogAspect logAspect = new LogAspect();
+        logAspect.logBefore();
         target.refundOrder();
     }
 }
 ```
 
+在使用时，不再使用 `OrderService` 类，而是使用代理：
 
+```Java
+OrderService orderService = new OrderService();
+OrderServiceProxy proxy = new OrderServiceProxy(orderService);
+
+proxy.createOrder();
+proxy.cancelOrder();
+proxy.refundOrder();
+```
+
+这样，业务类 `OrderService` 保持干净，与日志这一类事务可以完全分离开。但是还存在一些问题，如果有一百个方法，这样还是得写一百次方法增强代码，于是，可以引入接口+JDK动态代理来解决这一问题。
 
 ## JDK 动态代理
+
+先为 OrderService 抽象出一个接口，再让业务类实现它
+
+```Java title="OrderService的接口"
+public interface IOrderService {
+    void createOrder();
+    void cancelOrder();
+    void refundOrder();
+}
+```
+
+```Java title="OrderService的实现"
+public class OrderService implements IOrderService {
+    public void createOrder() {
+        System.out.println("下单成功！");
+    }
+    public void cancelOrder() {
+        System.out.println("订单取消！");
+    }
+    public void refundOrder() {
+        System.out.println("退款成功！");
+    }
+}
+```
+
+接着，使用 Java 的动态代理统一处理日志增强，定义代理类时需要实现 `InvocationHandle` 接口
+
+```Java title="切面类"
+// 自定义一个切面类用于通知处理
+public class LogAspect {
+    public void logBefore(String methodName) {
+        System.out.println("[日志] 正在执行 " + methodName + " 方法");
+    }
+
+    public void logAfter(String methodName) {
+        System.out.println("[日志] 执行完 " + methodName + " 方法");
+    }
+}
+```
+
+```Java title="代理类"
+package com.example.proxy;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
+// 定义代理类
+public class MyProxy implements InvocationHandler {
+    private Object target; // 被代理对象
+
+    // 构造方法接收目标对象
+    public MyProxy(Object target) {
+        this.target = target;
+    }
+
+    // 创建代理对象的方法
+    public Object createProxy() {
+        // 获取目标对象的类加载器
+        ClassLoader classLoader = target.getClass().getClassLoader();
+        // 获取目标对象实现的接口
+        Class[] interfaces = target.getClass().getInterfaces();
+        // 返回代理对象
+        return Proxy.newProxyInstance(classLoader, interfaces, this);
+    }
+
+    // 处理方法调用时的增强逻辑
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) {
+        LogAspect logAspect = new LogAspect();
+        // 在目标方法执行前加日志(前增强)
+        logAspect.logBefore(method.geName());
+
+        // 执行目标方法
+        Object result = method.invoke(target, args);
+
+        // 在目标方法执行后加日志(后增强)
+        logAspect.logAfter(method.geName());
+
+        return result;
+    }
+}
+```
+
+在使用时，构造代理对象，为其注入目标对象之后，只需要用代理对象 + **原对象接口方法**即可增强原对象的方法。
+
+使用方法如下：
+
+```Java
+public class Main {
+    public static void main(String[] args) {
+        // 创建订单服务实例
+        OrderService orderService = new OrderService();
+
+        // 创建代理类实例，并生成代理对象
+        MyProxy proxy = new MyProxy(orderService);
+        IOrderService orderServiceProxy = (IOrderService) proxy.createProxy();
+
+        // 使用代理对象调用方法
+        orderServiceProxy.createOrder();
+        orderServiceProxy.cancelOrder();
+        orderServiceProxy.refundOrder();
+    }
+}
+```
+
+??? question "为什么代理对象没有实现 `IOrderService` 接口，却可以调用其方法？"
+    在 JDK 动态代理机制下，所有实现了 `InvocationHandler` 接口的类（例如此处的 `MyProxy` 类）会拦截对代理对象的方法调用（如此处的 `createOrder()`），并转发到 `invoke()` 方法。
+
+    在 `invoke()` 方法中，首先执行前增强
+
+    然后通过 `method.invoke(target)` 调用目标对象的 `target` 的实际方法（即实际目标对象的 `createOrder()` ）
+
+    在
+
+这样，只需为不同的切面书写不同的通知逻辑即可。
+
+## CGLib 动态代理
 
