@@ -222,13 +222,13 @@ public class MyProxy implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) {
         LogAspect logAspect = new LogAspect();
         // 在目标方法执行前加日志(前增强)
-        logAspect.logBefore(method.geName());
+        logAspect.logBefore(method.getName());
 
         // 执行目标方法
         Object result = method.invoke(target, args);
 
         // 在目标方法执行后加日志(后增强)
-        logAspect.logAfter(method.geName());
+        logAspect.logAfter(method.getName());
 
         return result;
     }
@@ -270,3 +270,184 @@ public class Main {
 
 ## CGLib 动态代理
 
+与JDK动态代理依靠反射不同，CGLib动态代理依靠字节码操作，创造一个增强后的子类继承自原有父类，通过这个子类对象来实现对原对象的增强。
+
+```Java title="CGLib动态代理的代理类"
+package com.example.proxy;
+
+import org.springframework.cglib.proxy.Enhancer;
+import org.springframework.cglib.proxy.MethodInterceptor;
+import org.springframework.cglib.proxy.MethodProxy;
+
+import java.lang.reflect.Method;
+
+// 定义代理类
+public class CGLibProxy implements MethodInterceptor {
+    public Object createProxy(Object target) {
+        Enhancer enhancer = new Enhancer();         // 构造CGLib的Enhancer工具类
+        enhancer.setSuperclass(target.getClass());  // 设置增强的父类
+        enhancer.setCallback(this);                 // 设置带有拦截方法的对象，这里就是这个代理类本身，他拥有intercept方法
+        return enhancer.create();                   // 生成一个带有增强方法的新类对象
+    }
+
+    // (1)
+    @Override
+    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable{
+        // 这里的切面类还是之前那个
+        LogAspect logAspect = new LogAspect();
+
+        // 前增强
+        logAspect.logBefore(method.getName());
+
+        // 执行目标方法
+        Object result = methodProxy.invokeSuper(o, objects);
+
+        // 在目标方法执行后加日志(后增强)
+        logAspect.logAfter(method.getName());
+
+        return result;
+    }
+}
+```
+
+1. | 参数名             | 类型                          | 功能说明                                                                                           |
+|------------------|-----------------------------|--------------------------------------------------------------------------------------------------|
+| `o`              | `Object`                    | **代理对象本身**。生成的子类对象实例（比如`UserDao2 userDao2Plus`那个代理对象）。                              |
+| `method`         | `Method`（反射API）          | 当前被拦截的方法对象，提供**方法元信息**（方法名、参数类型、返回类型等）。                                          |
+| `objects`        | `Object[]`                  | 方法的参数列表（如果方法带参数，这里就是调用时传入的参数数组；无参数时是空数组）。                                     |
+| `methodProxy`    | `MethodProxy`（CGLIB专用）   | 用于高效调用被代理类的原始方法，推荐使用`methodProxy.invokeSuper()`来避免传统反射的性能损失。                         |
+
+## 基于 XML 的 AOP 实现
+
+上述内容还没有涉及到 Spring 的声明式 AOP。接下来做有关 Spring 的 AOP 笔记
+
+``` xml title="声明式AOP用到的依赖包"
+<!-- aspectjrt包的依赖 -->
+<dependency>
+     <groupId>org.aspectj</groupId>
+     <artifactId>aspectjrt</artifactId>
+     <version>1.9.1</version>	
+</dependency>
+<!-- aspectjweaver包的依赖 -->
+<dependency>
+     <groupId>org.aspectj</groupId>
+     <artifactId>aspectjweaver</artifactId>
+     <version>1.9.6</version>	
+</dependency>
+```
+
+在使用基于 XML 的 AOP 时，不必再写上面提到的复杂的代理类，只需要定义好切面类，在 spring 的 XML 配置文件中用标签声明好切面、切入点、通知与切入点的关系（具体是前/后增强还是环绕）即可。当然，切面类和具体的服务类都要作为 bean 来管理，一样要写在 spring 的配置中。
+
+具体地，有关 SpringAOP 的标签如下：
+
+| 元素                | 描述                                           |
+|:---------------------:|:----------------------------------------------:|
+| `<aop:config>`      | Spring AOP配置的根元素                            |
+| `<aop:aspect>`      | 配置切面                                      |
+| `<aop:advisor>`     | 配置通知器                                     |
+| `<aop:pointcut>`    | 配置切点                                      |
+| `<aop:before>`      | 配置前置通知,在目标方法执行前实施增强,可以应用于权限管理等功能               |
+| `<aop:after>`       | 配置后置通知,在目标方法执行后实施增强,可以应用于关闭流、上传文件、删除临时文件等功能 |
+| `<aop:around>`      | 配置环绕方式,在目标方法执行前后实施增强,可以应用于日志、事务管理等功能            |
+| `<aop:after-returning>` | 配置返回通知,在目标方法成功执行之后调用通知                     |
+| `<aop:after-throwing>`  | 配置异常通知,在方法抛出异常后实施增强,可以应用于处理异常记录日志等功能            |
+
+一个具体的 XML 配置可能类似以下结构：
+
+```XML
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+    <!--UserDAO对象-->
+    <bean id="userDao" class="com.example.XMLProxy.DAO.UserDaoImpl" />
+    <!--切面类对象-->
+    <bean id="xmlAspect" class="com.example.XMLProxy.Aspect.XmlAspect"/>
+    <!--AOP-->
+    <aop:config>
+        <!--全局切入点-->
+        <aop:pointcut id="pointcut" expression="execution(* com.example.XMLProxy.DAO.UserDaoImpl.*(..))"/>
+        <!--配置切面-->
+        <aop:aspect ref="xmlAspect">
+            <!--上面的全局切入点也可以写在这里，写在这里只对当前切面生效-->
+            <!--配置关系-->
+            <aop:before method="before" pointcut-ref="pointcut"/>
+        </aop:aspect>
+    </aop:config>
+</beans>
+```
+
+关于切入点的 `<aop:pointcut>` 元素，通常会指定指定id、expression 属性。其中 expression 属性用于指定切入点关联的**切入点表达式**。其基本格式如下：
+
+```XML
+execution(modifiers-pattern?ret-type-pattern declaring-type-pattern?
+name-pattern(param-pattern) throws-pattern?)
+```
+
+其中，各个部分的参数说明如下：
+
+- modifiers-pattern：表示定义的目标方法的访问修饰符，如public、private等。
+- ret-type-pattern：表示定义的目标方法的返回值类型，如void、String等。
+- declaring-type-pattern：表示定义的目标方法的类路径，如com.itheima.jdk.UserDaoImpl。
+- name-pattern：表示具体需要被代理的目标方法，如add()方法。
+- param-pattern：表示需要被代理的目标方法包含的参数，本章示例中目标方法参数都为空。
+- throws-pattern：表示需要被代理的目标方法抛出的异常类型。
+
+也有一个比较简单的记法：
+
+```xml
+execution(返回值 包名.类名.方法名(参数))
+<!--完整的形式-->
+execution([修饰符] 返回值类型 全限定类名.方法名(参数列表) throws 异常类型)
+```
+
+用 `*` 做通配，用 `..` 匹配任意层级、任意个参数。
+
+配置完成后，在测试类中，读取 XML 配置，定义 DAO 对象，直接调用方法即可。 
+
+## 基于注解的 AOP 实现
+
+有关的注解如下：
+
+| 元素                | 描述               |
+|:---------------------:|:--------------------:|
+| @Aspect             | 配置切面           |
+| @Pointcut           | 配置切点           |
+| @Before             | 配置前置通知       |
+| @After              | 配置后置通知       |
+| @Around             | 配置环绕方式       |
+| @AfterReturning     | 配置返回通知       |
+| @AfterThrowing      | 配置异常通知       |
+
+用注解实现 AOP，只需要在基于 XML 的 AOP 实现中，在切面类中定义一个空方法pointCut()，这个方法也可以叫其他名字，仅仅只是起一个标记作用。为这个空方法添加@pointcut注解，在各个具体的通知方法前加上@Before、@After等注解，并在配置文件中启用自动代理即可
+
+xml 配置文件类似以下结构：
+
+```xml
+<!--以上部分省略-->
+    <!--配置bean-->
+    <bean id="userDao" class="com.example.AnnoAOP.DAO.UserDaoImpl"/>
+    <bean id="annoAspect" class="com.example.AnnoAOP.Aspect.AnnoAspect"/>
+    <aop:aspectj-autoproxy/>
+```
+
+Aspect 类可能类似以下结构：
+
+```Java
+@Aspect
+public class AnnoAspect {
+    @Pointcut("execution(* com.example.AnnoAOP.DAO.UserDaoImpl.* (..))")
+    public void pointCut() {
+    }
+    @Before("pointCut()")
+    public void before() {
+        System.out.println("前置通知");
+    }
+}
+```
